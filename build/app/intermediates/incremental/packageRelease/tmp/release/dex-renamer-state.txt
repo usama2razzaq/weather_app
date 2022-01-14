@@ -1,0 +1,4 @@
+#Fri Jan 14 14:57:39 MYT 2022
+base.0=/Users/micare/Desktop/Flutter Project/weather_app/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

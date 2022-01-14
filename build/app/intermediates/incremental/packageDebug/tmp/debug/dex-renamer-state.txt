@@ -1,0 +1,4 @@
+#Sat Jan 15 01:15:41 MYT 2022
+base.0=/Users/micare/Desktop/Flutter Project/weather_app/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

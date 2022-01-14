@@ -1,0 +1,98 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.weather_app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+9        android:targetSdkVersion="31" />
+10    <!--
+11         Flutter needs it to communicate with the running application
+12         to allow setting breakpoints, to provide hot reload, etc.
+13    -->
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:4:5-66
+14-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:4:22-64
+15    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+15-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:5:5-77
+15-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:5:22-74
+16    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+16-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:6:5-84
+16-->/Users/micare/Desktop/Flutter Project/weather_app/android/app/src/main/AndroidManifest.xml:6:22-82
+17    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+17-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:7:5-81
+17-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:7:22-78
+18    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+18-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:8:5-79
+18-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:8:22-76
+19
+20    <application
+21        android:name="android.app.Application"
+22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+22-->[androidx.core:core:1.6.0] /Users/micare/.gradle/caches/transforms-2/files-2.1/5f663b08eec19eef9a9d1af662d9025e/core-1.6.0/AndroidManifest.xml:24:18-86
+23        android:debuggable="true"
+24        android:icon="@mipmap/ic_launcher"
+25        android:label="weather_app" >
+26        <activity
+27            android:name="com.example.weather_app.MainActivity"
+28            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+29            android:exported="true"
+30            android:hardwareAccelerated="true"
+31            android:launchMode="singleTop"
+32            android:theme="@style/LaunchTheme"
+33            android:windowSoftInputMode="adjustResize" >
+34
+35            <!--
+36                 Specifies an Android theme to apply to this Activity as soon as
+37                 the Android process has started. This theme is visible to the user
+38                 while the Flutter UI initializes. After that, this theme continues
+39                 to determine the Window background behind the Flutter UI.
+40            -->
+41            <meta-data
+42                android:name="io.flutter.embedding.android.NormalTheme"
+43                android:resource="@style/NormalTheme" />
+44
+45            <intent-filter>
+46                <action android:name="android.intent.action.MAIN" />
+47
+48                <category android:name="android.intent.category.LAUNCHER" />
+49            </intent-filter>
+50        </activity>
+51        <!--
+52             Don't delete the meta-data below.
+53             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+54        -->
+55        <meta-data
+56            android:name="flutterEmbedding"
+57            android:value="2" />
+58
+59        <service
+59-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:11:9-15:56
+60            android:name="com.lyokone.location.FlutterLocationService"
+60-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:12:13-71
+61            android:enabled="true"
+61-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:13:13-35
+62            android:exported="false"
+62-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:14:13-37
+63            android:foregroundServiceType="location" />
+63-->[:location] /Users/micare/Desktop/Flutter Project/weather_app/build/location/intermediates/library_manifest/debug/AndroidManifest.xml:15:13-53
+64
+65        <activity
+65-->[com.google.android.gms:play-services-base:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/38beef0dac1d60c75d0ecf6b402c9d17/jetified-play-services-base-16.0.1/AndroidManifest.xml:23:9-26:75
+66            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+66-->[com.google.android.gms:play-services-base:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/38beef0dac1d60c75d0ecf6b402c9d17/jetified-play-services-base-16.0.1/AndroidManifest.xml:24:13-79
+67            android:exported="false"
+67-->[com.google.android.gms:play-services-base:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/38beef0dac1d60c75d0ecf6b402c9d17/jetified-play-services-base-16.0.1/AndroidManifest.xml:25:13-37
+68            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+68-->[com.google.android.gms:play-services-base:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/38beef0dac1d60c75d0ecf6b402c9d17/jetified-play-services-base-16.0.1/AndroidManifest.xml:26:13-72
+69
+70        <meta-data
+70-->[com.google.android.gms:play-services-basement:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/afd08568427ac867bad121f4ed6b7b61/jetified-play-services-basement-16.0.1/AndroidManifest.xml:23:9-25:69
+71            android:name="com.google.android.gms.version"
+71-->[com.google.android.gms:play-services-basement:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/afd08568427ac867bad121f4ed6b7b61/jetified-play-services-basement-16.0.1/AndroidManifest.xml:24:13-58
+72            android:value="@integer/google_play_services_version" />
+72-->[com.google.android.gms:play-services-basement:16.0.1] /Users/micare/.gradle/caches/transforms-2/files-2.1/afd08568427ac867bad121f4ed6b7b61/jetified-play-services-basement-16.0.1/AndroidManifest.xml:25:13-66
+73    </application>
+74
+75</manifest>
