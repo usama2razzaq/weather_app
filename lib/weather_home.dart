@@ -28,6 +28,7 @@ class _HomeWeatherState extends State<HomeWeather> {
   bool? _serviceEnabled = false;
   PermissionStatus? _permissionGranted;
   LocationData? _locationData;
+  final currentTime = DateTime.now();
 
   WeatherBlock? weatherBlock;
 
@@ -47,21 +48,13 @@ class _HomeWeatherState extends State<HomeWeather> {
 
   LocationData? _currentLocation;
   var hour = DateTime.now().hour;
+  String? dateFormatted;
 
   SharedPref sharedPref = SharedPref();
 
   City? cityload;
 
   @override
-  void main() {
-    final currentTime = DateTime.now();
-
-    final timestamp1 = 1642029808;
-    final DateTime date1 =
-        DateTime.fromMillisecondsSinceEpoch(timestamp1 * 1000);
-    print(date1);
-  }
-
   Future<void> initPlatformState() async {
     // _serviceEnabled = await location.serviceEnabled();
     // if (!_serviceEnabled!) {
@@ -109,8 +102,6 @@ class _HomeWeatherState extends State<HomeWeather> {
   }
 
   void initState() {
-    main();
-
     weatherBlock = WeatherBlock();
     weatherBlock!.initMultipleCities(cityList!);
 
@@ -212,10 +203,19 @@ class _HomeWeatherState extends State<HomeWeather> {
                     stream: weatherBlock!.stateStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
+                        final DateTime date =
+                            DateTime.fromMillisecondsSinceEpoch(
+                                snapshot.data!.dt * 1000);
+
+                        var outputFormat =
+                            DateFormat('EEE d, MMM ' 'hh:mm aaa');
+                        var outputDate = outputFormat.format(date);
+                        print("new date firmatted $outputDate");
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return LoadingIndicator();
                         }
+
                         return Container(
 
                             // ignore: unnecessary_new
@@ -256,7 +256,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                                                     fontSize: 20)),
                                           ],
                                         ),
-                                        Text("Tue, 11 Jan 10:53 PM",
+                                        Text(outputDate,
                                             style: TextStyle(
                                                 color: Colors.black
                                                     .withOpacity(0.6),
@@ -306,7 +306,9 @@ class _HomeWeatherState extends State<HomeWeather> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("Fair",
+                                      Text(
+                                          snapshot
+                                              .data!.weatherDesc.description,
                                           style: TextStyle(
                                               color:
                                                   Colors.black.withOpacity(0.6),
@@ -368,18 +370,6 @@ class _HomeWeatherState extends State<HomeWeather> {
                                     ciitywheater:
                                         '${weatherList[position].getmainWeather.temp.round()}');
                               });
-
-                          //    (
-                          // scrollDirection: Axis.horizontal,
-                          // children: [
-                          //   for (int i = 0; i < cityList!.length; i++)
-                          //     WheatherShowcase(
-                          //       ciityIcon:
-                          //           '"https://imgd.aeplcdn.com/1280x720/n/cw/ec/39082/tucson-exterior-right-front-three-quarter.jpeg?q=85",',
-                          //       ciityName: cityList![i],
-                          //       ciitywheater: '30',
-                          //     ),
-                          // ]);
                         } else {
                           return Container();
                         }
