@@ -5,6 +5,7 @@ class Weather {
 
   MainWeather getmainWeather;
   WeatherDesc weatherDesc;
+  String dt_txt;
 
   Weather(
       {required this.id,
@@ -12,7 +13,8 @@ class Weather {
       required this.name,
       required this.timezone,
       required this.getmainWeather,
-      required this.weatherDesc});
+      required this.weatherDesc,
+      required this.dt_txt});
 
   factory Weather.fromJson(Map<String, dynamic> json) {
     return Weather(
@@ -20,6 +22,7 @@ class Weather {
       dt: json['dt'],
       name: json['name'],
       timezone: json['timezone'],
+      dt_txt: json['dt_txt'],
       getmainWeather: MainWeather.fromJson(json['main']),
       weatherDesc: WeatherDesc.fromJson(json['weather'][0]),
     );

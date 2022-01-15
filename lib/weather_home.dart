@@ -30,7 +30,7 @@ class _HomeWeatherState extends State<HomeWeather> {
   LocationData? _locationData;
   final currentTime = DateTime.now();
 
-  WeatherBlock? weatherBlock;
+  WeatherBloc? weatherBlock;
 
   String? error;
   List<String>? cityList = [
@@ -56,27 +56,6 @@ class _HomeWeatherState extends State<HomeWeather> {
 
   @override
   Future<void> initPlatformState() async {
-    // _serviceEnabled = await location.serviceEnabled();
-    // if (!_serviceEnabled!) {
-    //   _serviceEnabled = await location.requestService();
-    //   print('check location have' "${_currentLocation!.latitude}");
-
-    //   if (!_serviceEnabled!) {
-    //     print('check location have' "${_currentLocation!.latitude}");
-    //     return;
-    //   }
-    // }
-
-    // _permissionGranted = await location.hasPermission();
-    // if (_permissionGranted == PermissionStatus.denied) {
-    //   print('location denied');
-    //   _permissionGranted = await location.requestPermission();
-    //   if (_permissionGranted != PermissionStatus.granted) {
-    //     print('location granted');
-    //     return;
-    //   }
-    // }
-
     _locationData = await location.getLocation();
     _currentLocation = await _locationService;
 
@@ -102,7 +81,7 @@ class _HomeWeatherState extends State<HomeWeather> {
   }
 
   void initState() {
-    weatherBlock = WeatherBlock();
+    weatherBlock = WeatherBloc();
     weatherBlock!.initMultipleCities(cityList!);
 
     if (_currentLocation == null) {

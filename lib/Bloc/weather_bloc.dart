@@ -12,10 +12,11 @@ import 'package:weather_app/Model/Get_Weather_Model.dart';
 enum Weather_Event {
   GET_CURRENT_WEATHER,
   GET_WEATHER_BY_CITY,
-  GET_MULTIPLE_WEATHER
+  GET_MULTIPLE_WEATHER,
+  GET_WEATHER_FORECAST_5_DAYS
 }
 
-class WeatherBlock {
+class WeatherBloc {
   String? lat, long;
   String? city2;
   final eventStreamController = new StreamController<Weather_Event>.broadcast();
@@ -69,7 +70,7 @@ class WeatherBlock {
 
   List<Weather> weatherList = [];
 
-  WeatherBlock() {
+  WeatherBloc() {
     _eventStream.listen((event) async {
       if (event == Weather_Event.GET_CURRENT_WEATHER) {
         // _stateSink.add("load");
@@ -90,7 +91,7 @@ class WeatherBlock {
       } else if (event == Weather_Event.GET_WEATHER_BY_CITY) {
         final url =
             "https://api.openweathermap.org/data/2.5/weather?q=$city2&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric";
-        print(url);
+
         Response response = await ApiHelper().initGet(url);
         print(response.body);
         if (response.statusCode == 200) {
@@ -108,6 +109,7 @@ class WeatherBlock {
         int i = 0;
 
         multipleList.forEach((element) async {
+          //   https://api.openweathermap.org/data/2.5/forecast?q= Kuala Lumpur&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric
           final url =
               "https://api.openweathermap.org/data/2.5/weather?q=$element&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric";
           Response response = await ApiHelper().initGet(url);
