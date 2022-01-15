@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_app/API%20Helper/api_helper.dart';
 import 'package:weather_app/Bloc/weather_bloc.dart';
 import 'package:weather_app/Model/Get_Weather_Model.dart';
 import 'package:weather_app/Stored%20City/stored_file.dart';
@@ -75,7 +77,9 @@ class _WeatherDetailsState extends State<WeatherDetails> {
               Padding(
                 padding: EdgeInsets.only(right: 20.0),
                 child: GestureDetector(
-                  onTap: () async {},
+                  onTap: () async {
+                    _add(context, widget.ciityName);
+                  },
                   child: Center(
                     child: Text(
                       'Add to favorite',
@@ -349,34 +353,21 @@ class _WeatherDetailsState extends State<WeatherDetails> {
     ));
   }
 
-  // void _update() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   cityList = prefs.getStringList('city');
-  //   if (cityList != null) {
-  //     print('city list' '${cityList!.length}');
-  //     for (int i = 0; i < cityList!.length; i++) {}
-  //   } else {}
-  // }
+  void showSnackBar(BuildContext context1, String message) async {
+    const snackBar = SnackBar(
+      content: Text('Your city was added'),
+    );
 
-  // Future<List<CityDataModel>> ReadJsonData() async {
-  //   final jsondata =
-  //       await rootBundle.rootBundle.loadString('assets/cities/my.json');
-  //   final list = json.decode(jsondata) as List<dynamic>;
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
-  //   return list.map((e) => CityDataModel.fromJson(e)).toList();
-  // }
-}
+  void _add(BuildContext context, String city) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-class CityDataModel {
-  //data Type
-  String? city;
+    cityList!.add(city);
+    print('new city list $cityList');
 
-// constructor
-  CityDataModel({
-    this.city,
-  });
-  //method that assign values to respective datatype vairables
-  CityDataModel.fromJson(Map<String, dynamic> json) {
-    city = json['city'];
+    prefs.setStringList('city', cityList!);
+    showSnackBar(context, 'Your city was added');
   }
 }

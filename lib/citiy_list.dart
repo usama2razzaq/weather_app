@@ -10,8 +10,10 @@ import 'package:weather_app/Stored%20City/stored_file.dart';
 import 'package:weather_app/weather_details.dart';
 
 class CityList extends StatefulWidget {
-  const CityList({Key? key}) : super(key: key);
+  final Function refresh;
+  const CityList({Key? key, required this.refresh}) : super(key: key);
 
+//constructor
   @override
   _CityListState createState() => _CityListState();
 }
@@ -22,7 +24,7 @@ class _CityListState extends State<CityList> {
 
   TextEditingController controller = TextEditingController();
   List<String>? cityList;
-  City? citySave;
+
   var hour = DateTime.now().hour;
 
   void initState() {
@@ -46,8 +48,6 @@ class _CityListState extends State<CityList> {
       if (userDetail.city!.toLowerCase().contains(text))
         _searchResult.add(userDetail);
     });
-
-    setState(() {});
   }
 
   @override
@@ -77,6 +77,12 @@ class _CityListState extends State<CityList> {
                   'Select City',
                   style: TextStyle(color: Colors.black),
                 ),
+                leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () {
+                      widget.refresh();
+                      Navigator.pop(context);
+                    }),
               ),
               Container(
                 color: Colors.transparent,
@@ -218,14 +224,6 @@ class _CityListState extends State<CityList> {
   void showSnackBar(BuildContext context, String message) async {
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar((snackBar));
-  }
-
-  void _add(BuildContext context, String city) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    cityList?.add(city);
-
-    prefs.setStringList('city', cityList!);
-    showSnackBar(context, 'Your city was added');
   }
 
   Future<List<CityDataModel>> ReadJsonData() async {

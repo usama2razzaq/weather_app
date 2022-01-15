@@ -34,12 +34,6 @@ class _HomeWeatherState extends State<HomeWeather> {
   WeatherBloc? weatherBlock;
 
   String? error;
-  List<String>? cityList = [
-    'Kuala Lumpur',
-    'Petaling Jaya',
-    'George Town',
-    'Shah Alam'
-  ];
 
   bool checkLoc = false;
   bool checkDay = false;
@@ -54,6 +48,22 @@ class _HomeWeatherState extends State<HomeWeather> {
   SharedPref sharedPref = SharedPref();
 
   City? cityload;
+  refresh() {
+    setState(() {
+      weatherBlock = WeatherBloc();
+
+      getCityList();
+
+      if (currentLocation == null) {
+        weatherBlock!.initGetCurrentLocation(
+          lat,
+          long,
+        );
+      } else {
+        initPlatformState();
+      }
+    });
+  }
 
   @override
   Future<void> initPlatformState() async {
@@ -81,10 +91,26 @@ class _HomeWeatherState extends State<HomeWeather> {
     });
   }
 
+  void getCityList() async {
+    cityList = ['Kuala Lumpur', 'Petaling Jaya', 'George Town', 'Shah Alam'];
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getStringList('city') == null) {
+      print('new city list $cityList');
+      weatherBlock!.initMultipleCities(cityList!);
+    } else {
+      print('new city list $cityList');
+      cityList = prefs.getStringList('city');
+      weatherBlock!.initMultipleCities(cityList!);
+    }
+  }
+
   @override
   void initState() {
     weatherBlock = WeatherBloc();
-    weatherBlock!.initMultipleCities(cityList!);
+
+    getCityList();
 
     if (currentLocation == null) {
       weatherBlock!.initGetCurrentLocation(
@@ -149,7 +175,6 @@ class _HomeWeatherState extends State<HomeWeather> {
                       padding: EdgeInsets.only(right: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          print('refresh');
                           var _locationService = Location().getLocation();
 
                           initPlatformState();
@@ -167,8 +192,15 @@ class _HomeWeatherState extends State<HomeWeather> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const CityList()),
+                              builder: (context) => CityList(
+                                    refresh: refresh,
+                                  )),
                         );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => const CityList()),
+                        // );
                       },
                       child: Icon(
                         Icons.add,
