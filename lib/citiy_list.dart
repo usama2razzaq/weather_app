@@ -107,7 +107,6 @@ class _CityListState extends State<CityList> {
                     if (data.hasError) {
                       return Center(child: Text("${data.error}"));
                     } else if (data.hasData) {
-                      var items = data.data as List<CityDataModel>;
                       return Expanded(
                           child: _searchResult.length != 0 ||
                                   controller.text.isNotEmpty
@@ -138,10 +137,7 @@ class _CityListState extends State<CityList> {
                                                         left: 8, right: 8),
                                                     child: Text(
                                                       _searchResult[index]
-                                                              .city! +
-                                                          ' ' +
-                                                          _searchResult[index]
-                                                              .city!,
+                                                          .city!,
                                                       style: TextStyle(
                                                           fontSize: 16,
                                                           color: Colors.white,
@@ -159,9 +155,10 @@ class _CityListState extends State<CityList> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   WeatherDetails(
-                                                    ciityName: items[index]
-                                                        .city
-                                                        .toString(),
+                                                    ciityName:
+                                                        _searchResult[index]
+                                                            .city
+                                                            .toString(),
                                                   )),
                                         );
                                       },
@@ -189,10 +186,7 @@ class _CityListState extends State<CityList> {
                                                   padding: EdgeInsets.only(
                                                       left: 8, right: 8),
                                                   child: Text(
-                                                    _cityDetails[index].city! +
-                                                        ' ' +
-                                                        _cityDetails[index]
-                                                            .city!,
+                                                    _cityDetails[index].city!,
                                                     style: TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.white,
@@ -209,9 +203,9 @@ class _CityListState extends State<CityList> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   WeatherDetails(
-                                                    ciityName: items[index]
-                                                        .city
-                                                        .toString(),
+                                                    ciityName:
+                                                        _cityDetails[index]
+                                                            .city!,
                                                   )),
                                         );
                                       },

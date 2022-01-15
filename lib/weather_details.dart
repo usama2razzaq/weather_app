@@ -40,9 +40,7 @@ class _WeatherDetailsState extends State<WeatherDetails> {
   @override
   void initState() {
     weatherBlock = WeatherBloc();
-    setState(() {
-      weatherBlock!.initGetCity(widget.ciityName);
-    });
+    weatherBlock!.initGetCity(widget.ciityName);
 
     super.initState();
   }
