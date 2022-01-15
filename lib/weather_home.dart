@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/services.dart' as rootBundle;
 import 'package:location/location.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/API%20Helper/api_helper.dart';
 import 'package:weather_app/Bloc/weather_bloc.dart';
@@ -182,6 +183,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                     stream: weatherBlock!.stateStream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
+                        weatherBlock!.initGetForecasrCity(snapshot.data!.name);
                         final DateTime date =
                             DateTime.fromMillisecondsSinceEpoch(
                                 snapshot.data!.dt * 1000);
@@ -192,7 +194,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                         print("new date firmatted $outputDate");
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return LoadingIndicator();
+                          return Container();
                         }
 
                         return Container(
@@ -325,8 +327,6 @@ class _HomeWeatherState extends State<HomeWeather> {
                 SizedBox(
                   height: 30,
                 ),
-
-                /* from there */
                 Container(
                   width: double.maxFinite,
                   height: 200,
@@ -335,7 +335,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return LoadingIndicator();
+                          return Container();
                         }
 
                         if (snapshot.hasData) {
@@ -359,90 +359,96 @@ class _HomeWeatherState extends State<HomeWeather> {
                         }
                       }),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
                 Container(
                   // ignore: unnecessary_new
                   decoration: new BoxDecoration(
                       borderRadius: BorderRadius.circular(20.0),
                       color: Colors.black.withOpacity(0.5)),
-                  child: StreamBuilder<WeatherFocast>(
+                  child: StreamBuilder<List<WeatherFocast>>(
                       stream: weatherBlock!.statetWeatherForecastStream,
                       builder: (context, snapshot) {
-                        return Column(
-                          children: [
-                            for (int i = 0; i < 6; i++)
-                              Container(
-                                color: Colors.transparent,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(10),
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text("Tuesday",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16)),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Image.asset(
-                                            "assets/images/icons8-humidity-64.png",
-                                            height: 15,
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text("80%",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14)),
-                                        ],
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return LoadingIndicator();
+                        }
+                        if (snapshot.hasData) {
+                          return Column(
+                            children: [
+                              for (int i = 0; i < 6; i++)
+                                Container(
+                                  color: Colors.transparent,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text('Tuesday',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16)),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Image.asset(
+                                              "assets/images/icons8-humidity-64.png",
+                                              height: 15,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("80%",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(10),
-                                      color: Colors.transparent,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Icon(
-                                            Icons.wb_sunny_rounded,
-                                            color: Colors.amber,
-                                            size: 20,
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text("27/33 \u00B0C",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16)),
-                                          SizedBox(
-                                            width: 10,
-                                          )
-                                        ],
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Icon(
+                                              Icons.wb_sunny_rounded,
+                                              color: Colors.amber,
+                                              size: 20,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("27/33 \u00B0C",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16)),
+                                            SizedBox(
+                                              width: 10,
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                          ],
-                        );
+                                    ],
+                                  ),
+                                )
+                            ],
+                          );
+                        } else {
+                          return Container();
+                        }
                       }),
                 )
               ],
@@ -496,23 +502,24 @@ class LoadingIndicator extends StatelessWidget {
 
     return Container(
         padding: EdgeInsets.all(16),
-        color: Colors.black87,
+        color: Colors.transparent,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               _getLoadingIndicator(),
               _getHeading(context),
-              _getText(displayedText)
             ]));
   }
 
   Padding _getLoadingIndicator() {
     return Padding(
         child: Container(
-            child: CircularProgressIndicator(strokeWidth: 3),
-            width: 32,
-            height: 32),
+            // color: Colors.amber,
+            child: Lottie.asset('assets/cities/61302-weather-icon.json'),
+            //
+            width: 100,
+            height: 100),
         padding: EdgeInsets.only(bottom: 16));
   }
 

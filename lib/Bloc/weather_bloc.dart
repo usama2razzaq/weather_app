@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, constant_identifier_names
 
 import 'dart:async';
 import 'dart:collection';
@@ -11,6 +11,7 @@ import 'package:weather_app/Model/Get_Weather_Model.dart';
 
 enum Weather_Event {
   GET_CURRENT_WEATHER,
+
   GET_WEATHER_BY_CITY,
   GET_MULTIPLE_WEATHER,
   GET_WEATHER_FORECAST_5_DAYS
@@ -32,16 +33,23 @@ class WeatherBloc {
   final stateStreamMultipleController = StreamController<List<Weather>>();
 
   StreamSink get _stateMutipleSink => stateStreamMultipleController.sink;
+
   Stream<List<Weather>> get stateMutipleStream =>
       stateStreamMultipleController.stream;
 
   final stateWeatherForecastStreamController =
-      StreamController<WeatherFocast>();
+      StreamController<List<WeatherFocast>>();
 
-  StreamSink<WeatherFocast> get _stateWeatherForecastSink =>
+  StreamSink<List<WeatherFocast>> get _stateWeatherForecastSink =>
       stateWeatherForecastStreamController.sink;
-  Stream<WeatherFocast> get statetWeatherForecastStream =>
+  Stream<List<WeatherFocast>> get statetWeatherForecastStream =>
       stateWeatherForecastStreamController.stream;
+
+  //       final stateStreamController = new StreamController<List<GetAddressModel>>();
+
+  // StreamSink<List<GetAddressModel>> get _stateSink =>
+  //     stateStreamController.sink;
+  // Stream<List<GetAddressModel>> get stateStream => stateStreamController.stream;
 
   void initGetCurrentLocation(
     // BuildContext context,
@@ -143,9 +151,12 @@ class WeatherBloc {
         Response response = await ApiHelper().initGet(url);
         print(response.body);
         if (response.statusCode == 200) {
-          Weather weathers = Weather.fromJson(jsonDecode(response.body));
+          List responseData = json.decode(response.body)["list"] as List;
 
-          _stateSink.add(weathers);
+          print('forecast list ${response.body}');
+
+          _stateWeatherForecastSink
+              .add(responseData.map((e) => WeatherFocast.fromJson(e)).toList());
 
           print('sucess');
         } else {
