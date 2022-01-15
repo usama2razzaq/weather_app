@@ -284,5 +284,28 @@
     "capital": "minor", 
     "population": "", 
     "population_proper": ""
+  },
+  {
+    
+    "city": "Genting Highlands", 
+    "lat": "5.8713", 
+    "lng": "102.2318", 
+    "country": "Malaysia", 
+    "iso2": "MY", 
+    "admin_name": "Kelantan", 
+    "capital": "minor", 
+    "population": "", 
+    "population_proper": ""
+  },
+  {
+    "city": "Cameron Highlands", 
+    "lat": "5.8713", 
+    "lng": "102.2318", 
+    "country": "Malaysia", 
+    "iso2": "MY", 
+    "admin_name": "Kelantan", 
+    "capital": "minor", 
+    "population": "", 
+    "population_proper": ""
   }
 ]

@@ -19,29 +19,30 @@ enum Weather_Event {
 class WeatherBloc {
   String? lat, long;
   String? city2;
-  final eventStreamController = new StreamController<Weather_Event>.broadcast();
+  final eventStreamController = StreamController<Weather_Event>.broadcast();
 
   StreamSink get eventSink => eventStreamController.sink;
   Stream get _eventStream => eventStreamController.stream;
 
-  final stateStreamController = new StreamController<Weather>();
+  final stateStreamController = StreamController<Weather>();
 
   StreamSink get _stateSink => stateStreamController.sink;
   Stream<Weather> get stateStream => stateStreamController.stream;
 
-  final stateStreamMultipleController = new StreamController<List<Weather>>();
+  final stateStreamMultipleController = StreamController<List<Weather>>();
 
   StreamSink get _stateMutipleSink => stateStreamMultipleController.sink;
-  Stream<List<Weather>> get statestateMutipleStream =>
+  Stream<List<Weather>> get stateMutipleStream =>
       stateStreamMultipleController.stream;
 
-  final stateUserWalletStreamController = new StreamController<Weather>();
+  final stateWeatherForecastStreamController =
+      StreamController<WeatherFocast>();
 
-  StreamSink<Weather> get _stateUserWalletSink =>
-      stateUserWalletStreamController.sink;
-  Stream<Weather> get stateUserWalletStream =>
-      stateUserWalletStreamController.stream;
-  HashMap<String, dynamic> params = new HashMap<String, dynamic>();
+  StreamSink<WeatherFocast> get _stateWeatherForecastSink =>
+      stateWeatherForecastStreamController.sink;
+  Stream<WeatherFocast> get statetWeatherForecastStream =>
+      stateWeatherForecastStreamController.stream;
+
   void initGetCurrentLocation(
     // BuildContext context,
     String lat,
@@ -66,6 +67,14 @@ class WeatherBloc {
     city2 = city;
 
     eventSink.add(Weather_Event.GET_WEATHER_BY_CITY);
+  }
+
+  void initGetForecasrCity(
+    String city,
+  ) {
+    city2 = city;
+
+    eventSink.add(Weather_Event.GET_WEATHER_FORECAST_5_DAYS);
   }
 
   List<Weather> weatherList = [];
@@ -109,7 +118,6 @@ class WeatherBloc {
         int i = 0;
 
         multipleList.forEach((element) async {
-          //   https://api.openweathermap.org/data/2.5/forecast?q= Kuala Lumpur&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric
           final url =
               "https://api.openweathermap.org/data/2.5/weather?q=$element&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric";
           Response response = await ApiHelper().initGet(url);
@@ -128,6 +136,21 @@ class WeatherBloc {
 
           i += 1;
         });
+      } else if (event == Weather_Event.GET_WEATHER_FORECAST_5_DAYS) {
+        final url =
+            "https://api.openweathermap.org/data/2.5/forecast?q=$city2&appid=28b2d803b67e000c521ab9d983a00cbb&units=metric";
+
+        Response response = await ApiHelper().initGet(url);
+        print(response.body);
+        if (response.statusCode == 200) {
+          Weather weathers = Weather.fromJson(jsonDecode(response.body));
+
+          _stateSink.add(weathers);
+
+          print('sucess');
+        } else {
+          print('failed');
+        }
       }
     });
   }

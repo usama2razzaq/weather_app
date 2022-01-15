@@ -331,8 +331,13 @@ class _HomeWeatherState extends State<HomeWeather> {
                   width: double.maxFinite,
                   height: 200,
                   child: StreamBuilder(
-                      stream: weatherBlock?.statestateMutipleStream,
+                      stream: weatherBlock?.stateMutipleStream,
                       builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return LoadingIndicator();
+                        }
+
                         if (snapshot.hasData) {
                           List<Weather> weatherList =
                               snapshot.data as List<Weather>;
@@ -362,78 +367,83 @@ class _HomeWeatherState extends State<HomeWeather> {
                   decoration: new BoxDecoration(
                       borderRadius: BorderRadius.circular(20.0),
                       color: Colors.black.withOpacity(0.5)),
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < 6; i++)
-                        Container(
-                          color: Colors.transparent,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                  child: StreamBuilder<WeatherFocast>(
+                      stream: weatherBlock!.statetWeatherForecastStream,
+                      builder: (context, snapshot) {
+                        return Column(
+                          children: [
+                            for (int i = 0; i < 6; i++)
                               Container(
-                                padding: EdgeInsets.all(10),
                                 color: Colors.transparent,
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    SizedBox(
-                                      width: 10,
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      color: Colors.transparent,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text("Tuesday",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16)),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Image.asset(
+                                            "assets/images/icons8-humidity-64.png",
+                                            height: 15,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text("80%",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14)),
+                                        ],
+                                      ),
                                     ),
-                                    Text("Tuesday",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16)),
-                                    SizedBox(
-                                      width: 10,
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      color: Colors.transparent,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Icon(
+                                            Icons.wb_sunny_rounded,
+                                            color: Colors.amber,
+                                            size: 20,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text("27/33 \u00B0C",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16)),
+                                          SizedBox(
+                                            width: 10,
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    Image.asset(
-                                      "assets/images/icons8-humidity-64.png",
-                                      height: 15,
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text("80%",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14)),
                                   ],
                                 ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                color: Colors.transparent,
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Icon(
-                                      Icons.wb_sunny_rounded,
-                                      color: Colors.amber,
-                                      size: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("27/33 \u00B0C",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16)),
-                                    SizedBox(
-                                      width: 10,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
+                              )
+                          ],
+                        );
+                      }),
                 )
               ],
             ),
