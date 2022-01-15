@@ -45,12 +45,6 @@ class WeatherBloc {
   Stream<List<WeatherFocast>> get statetWeatherForecastStream =>
       stateWeatherForecastStreamController.stream;
 
-  //       final stateStreamController = new StreamController<List<GetAddressModel>>();
-
-  // StreamSink<List<GetAddressModel>> get _stateSink =>
-  //     stateStreamController.sink;
-  // Stream<List<GetAddressModel>> get stateStream => stateStreamController.stream;
-
   void initGetCurrentLocation(
     // BuildContext context,
     String lat,
@@ -168,3 +162,11 @@ class WeatherBloc {
 
   void dispose() {}
 }
+
+// String extractDateString(String dateTimeString) {
+//   DateTime dateTime = DateTime.parse(dateTimeString);
+//   String day = dateTime.day.toString().padLeft(2, '0');
+//   String month = dateTime.month.toString().padLeft(2, '0');
+//   String year = dateTime.year.toString().padLeft(4, '0');
+//   return '$day.$month.$year';
+// }

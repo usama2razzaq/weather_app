@@ -20,7 +20,6 @@ class _CityListState extends State<CityList> {
   List<CityDataModel> _searchResult = [];
   List<CityDataModel> _cityDetails = [];
 
-  SharedPref sharedPref = SharedPref();
   TextEditingController controller = TextEditingController();
   List<String>? cityList;
   City? citySave;
@@ -107,114 +106,106 @@ class _CityListState extends State<CityList> {
                     if (data.hasError) {
                       return Center(child: Text("${data.error}"));
                     } else if (data.hasData) {
-                      return Expanded(
-                          child: _searchResult.length != 0 ||
-                                  controller.text.isNotEmpty
-                              ? ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _searchResult.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      child: Card(
-                                        // ignore: unnecessary_new
-                                        margin: new EdgeInsets.symmetric(
-                                            horizontal: 20.0, vertical: 5),
-                                        color: Colors.black.withOpacity(0.1),
-                                        elevation: 1,
-                                        child: Container(
-                                            //color: Colors.amber,
-                                            padding: EdgeInsets.all(20),
-                                            child: Expanded(
-                                                child: Container(
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 8, right: 8),
-                                                    child: Text(
-                                                      _searchResult[index]
-                                                          .city!,
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ))),
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WeatherDetails(
-                                                    ciityName:
-                                                        _searchResult[index]
-                                                            .city
-                                                            .toString(),
-                                                  )),
-                                        );
-                                      },
-                                    );
-                                  })
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: _cityDetails.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      child: Card(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 20.0, vertical: 5),
-                                          color: Colors.black.withOpacity(0.1),
-                                          elevation: 1,
-                                          child: Container(
-                                            padding: EdgeInsets.all(20),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      left: 8, right: 8),
-                                                  child: Text(
-                                                    _cityDetails[index].city!,
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
+                      return _searchResult.length != 0 ||
+                              controller.text.isNotEmpty
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: _searchResult.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  child: Card(
+                                    // ignore: unnecessary_new
+                                    margin: new EdgeInsets.symmetric(
+                                        horizontal: 20.0, vertical: 5),
+                                    color: Colors.black.withOpacity(0.1),
+                                    elevation: 1,
+                                    child: Container(
+                                        //color: Colors.amber,
+                                        padding: EdgeInsets.all(20),
+                                        child: Expanded(
+                                            child: Container(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 8, right: 8),
+                                                child: Text(
+                                                  _searchResult[index].city!,
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                                 ),
-                                              ],
-                                            ),
-                                          )),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WeatherDetails(
-                                                    ciityName:
-                                                        _cityDetails[index]
-                                                            .city!,
-                                                  )),
-                                        );
-                                      },
+                                              ),
+                                            ],
+                                          ),
+                                        ))),
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => WeatherDetails(
+                                                ciityName: _searchResult[index]
+                                                    .city
+                                                    .toString(),
+                                              )),
                                     );
-                                  }));
+                                  },
+                                );
+                              })
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: _cityDetails.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  child: Card(
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 5),
+                                      color: Colors.black.withOpacity(0.1),
+                                      elevation: 1,
+                                      child: Container(
+                                        padding: EdgeInsets.all(20),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 8, right: 8),
+                                              child: Text(
+                                                _cityDetails[index].city!,
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => WeatherDetails(
+                                                ciityName:
+                                                    _cityDetails[index].city!,
+                                              )),
+                                    );
+                                  },
+                                );
+                              });
                     } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return Container();
                     }
                   },
                 ),

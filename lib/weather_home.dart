@@ -24,11 +24,11 @@ class HomeWeather extends StatefulWidget {
 }
 
 class _HomeWeatherState extends State<HomeWeather> {
-  Location location = new Location();
+  Location location = Location();
 
-  bool? _serviceEnabled = false;
-  PermissionStatus? _permissionGranted;
-  LocationData? _locationData;
+  bool? loading = false;
+  PermissionStatus? permissionGranted;
+  LocationData? locationData;
   final currentTime = DateTime.now();
 
   WeatherBloc? weatherBlock;
@@ -45,9 +45,9 @@ class _HomeWeatherState extends State<HomeWeather> {
   bool checkDay = false;
 
   var inputFormat = DateFormat('dd/MM/yyyy HH:mm');
-  var _locationService = Location().getLocation();
+  var locationService = Location().getLocation();
 
-  LocationData? _currentLocation;
+  LocationData? currentLocation;
   var hour = DateTime.now().hour;
   String? dateFormatted;
 
@@ -57,12 +57,12 @@ class _HomeWeatherState extends State<HomeWeather> {
 
   @override
   Future<void> initPlatformState() async {
-    _locationData = await location.getLocation();
-    _currentLocation = await _locationService;
+    locationData = await location.getLocation();
+    currentLocation = await locationService;
 
     try {
-      print('check location ios 1' "${_currentLocation?.latitude}");
-      print('check location ios 1' "${_currentLocation?.longitude}");
+      print('check location ios 1' "${currentLocation?.latitude}");
+      print('check location ios 1' "${currentLocation?.longitude}");
       checkLoc = true;
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
@@ -75,17 +75,18 @@ class _HomeWeatherState extends State<HomeWeather> {
     }
     setState(() {
       weatherBlock!.initGetCurrentLocation(
-        '${_currentLocation?.latitude}',
-        '${_currentLocation?.longitude}',
+        '${currentLocation?.latitude}',
+        '${currentLocation?.longitude}',
       );
     });
   }
 
+  @override
   void initState() {
     weatherBlock = WeatherBloc();
     weatherBlock!.initMultipleCities(cityList!);
 
-    if (_currentLocation == null) {
+    if (currentLocation == null) {
       weatherBlock!.initGetCurrentLocation(
         lat,
         long,
@@ -121,352 +122,380 @@ class _HomeWeatherState extends State<HomeWeather> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
+    return RefreshIndicator(
+      onRefresh: () => initPlatformState(),
+      child: Scaffold(
         body: Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: (hour < 19)
-              ? AssetImage("assets/images/day_bg.gif")
-              : AssetImage("assets/images/night_bg.gif"),
-          fit: BoxFit.fitHeight,
-        ),
-      ),
-      child: Column(
-        children: [
-          AppBar(
-            elevation: 0,
-            backgroundColor: Colors.black.withOpacity(0),
-            leading: GestureDetector(
-              child: Icon(
-                Icons.menu,
-              ),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: (hour < 19)
+                  ? AssetImage("assets/images/day_bg.gif")
+                  : AssetImage("assets/images/night_bg.gif"),
+              fit: BoxFit.fitHeight,
             ),
-            actions: [
-              Padding(
-                  padding: EdgeInsets.only(right: 20.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      print('refresh');
-
-                      var _locationService = Location().getLocation();
-
-                      initPlatformState();
-                    },
-                    child: Icon(
-                      Icons.refresh,
-                      size: 26.0,
-                    ),
-                  )),
-              Padding(
-                padding: EdgeInsets.only(right: 20.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    print('open new page');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CityList()),
-                    );
-                  },
+          ),
+          child: Column(
+            children: [
+              AppBar(
+                elevation: 0,
+                backgroundColor: Colors.black.withOpacity(0),
+                leading: GestureDetector(
                   child: Icon(
-                    Icons.add,
-                    size: 26.0,
+                    Icons.menu,
                   ),
                 ),
-              )
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                StreamBuilder<Weather>(
-                    stream: weatherBlock!.stateStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        weatherBlock!.initGetForecasrCity(snapshot.data!.name);
-                        final DateTime date =
-                            DateTime.fromMillisecondsSinceEpoch(
-                                snapshot.data!.dt * 1000);
+                actions: [
+                  Padding(
+                      padding: EdgeInsets.only(right: 20.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          print('refresh');
+                          var _locationService = Location().getLocation();
 
-                        var outputFormat =
-                            DateFormat('EEE d, MMM ' 'hh:mm aaa');
-                        var outputDate = outputFormat.format(date);
-                        print("new date firmatted $outputDate");
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Container();
-                        }
+                          initPlatformState();
+                        },
+                        child: Icon(
+                          Icons.refresh,
+                          size: 26.0,
+                        ),
+                      )),
+                  Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: GestureDetector(
+                      onTap: () async {
+                        print('open new page');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CityList()),
+                        );
+                      },
+                      child: Icon(
+                        Icons.add,
+                        size: 26.0,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    StreamBuilder<Weather>(
+                        stream: weatherBlock!.stateStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            weatherBlock!
+                                .initGetForecasrCity(snapshot.data!.name);
+                            final DateTime date =
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    snapshot.data!.dt * 1000);
 
-                        return Container(
+                            var outputFormat =
+                                DateFormat('EEE d, MMM ' 'hh:mm aaa');
+                            var outputDate = outputFormat.format(date);
+                            print("new date firmatted $outputDate");
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Container();
+                            }
 
-                            // ignore: unnecessary_new
-                            decoration: new BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0),
-                                color: Colors.black.withOpacity(0.1)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  color: Colors.transparent,
-                                  //  width: 150,
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      // ignore: prefer_const_literals_to_create_immutables
-                                      children: [
-                                        Row(
+                            return Container(
+
+                                // ignore: unnecessary_new
+                                decoration: new BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    color: Colors.black.withOpacity(0.1)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      color: Colors.transparent,
+                                      //  width: 150,
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           // ignore: prefer_const_literals_to_create_immutables
                                           children: [
-                                            Icon(
-                                              !checkLoc
-                                                  ? Icons.location_off
-                                                  : Icons.location_on,
-                                              color: Colors.white,
-                                              size: 20,
+                                            Row(
+                                              // ignore: prefer_const_literals_to_create_immutables
+                                              children: [
+                                                Icon(
+                                                  !checkLoc
+                                                      ? Icons.location_off
+                                                      : Icons.location_on,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(snapshot.data!.name,
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 20)),
+                                              ],
                                             ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(snapshot.data!.name,
+                                            Text(outputDate,
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 20)),
-                                          ],
-                                        ),
-                                        Text(outputDate,
-                                            style: TextStyle(
-                                                color: Colors.black
-                                                    .withOpacity(0.6),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12)),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          // ignore: prefer_const_literals_to_create_immutables
-                                          children: [
-                                            Container(
-                                              height: 60,
-                                              width: 60,
-                                              //  color: Colors.red,
-                                              child: Image.network(
-                                                'http://openweathermap.org/img/wn/${snapshot.data!.weatherDesc.icon}@2x.png',
-                                                height: 70,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                            // Icons(
-                                            //  Image.network('http://openweathermap.org/img/wn/10d@2x.png')
-                                            //   // color: Colors.white,
-                                            //  // size: 60,
-                                            // ),
-
-                                            Text(
-                                                "${snapshot.data!.getmainWeather.temp.round()}\u00B0C",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 50)),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                  color: Colors.transparent,
-                                  // width: 80,
-                                  height: 100,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          snapshot
-                                              .data!.weatherDesc.description,
-                                          style: TextStyle(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                          "${snapshot.data!.getmainWeather.temp_max.round()}/${snapshot.data!.getmainWeather.temp_min.round()} \u00B0C",
-                                          style: TextStyle(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14)),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                          "Feels like ${snapshot.data!.getmainWeather.feels_like.round()}\u00B0C",
-                                          style: TextStyle(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14)),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ));
-                      } else {
-                        return Container();
-                      }
-                    }),
-                SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  width: double.maxFinite,
-                  height: 200,
-                  child: StreamBuilder(
-                      stream: weatherBlock?.stateMutipleStream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Container();
-                        }
-
-                        if (snapshot.hasData) {
-                          List<Weather> weatherList =
-                              snapshot.data as List<Weather>;
-
-                          return ListView.builder(
-                              // shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: weatherList.length,
-                              itemBuilder: (context, position) {
-                                return WheatherShowcase(
-                                    ciityIcon:
-                                        "http://openweathermap.org/img/wn/${weatherList[position].weatherDesc.icon}@2x.png",
-                                    ciityName: weatherList[position].name,
-                                    ciitywheater:
-                                        '${weatherList[position].getmainWeather.temp.round()}');
-                              });
-                        } else {
-                          return Container();
-                        }
-                      }),
-                ),
-                Container(
-                  // ignore: unnecessary_new
-                  decoration: new BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.black.withOpacity(0.5)),
-                  child: StreamBuilder<List<WeatherFocast>>(
-                      stream: weatherBlock!.statetWeatherForecastStream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return LoadingIndicator();
-                        }
-                        if (snapshot.hasData) {
-                          return Column(
-                            children: [
-                              for (int i = 0; i < 6; i++)
-                                Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                        color: Colors.transparent,
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text('Tuesday',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16)),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Image.asset(
-                                              "assets/images/icons8-humidity-64.png",
-                                              height: 15,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text("80%",
-                                                style: TextStyle(
-                                                    color: Colors.white,
+                                                    color: Colors.black
+                                                        .withOpacity(0.6),
                                                     fontWeight: FontWeight.w600,
-                                                    fontSize: 14)),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: EdgeInsets.all(10),
-                                        color: Colors.transparent,
-                                        child: Row(
-                                          children: [
+                                                    fontSize: 12)),
                                             SizedBox(
-                                              width: 10,
+                                              height: 10,
                                             ),
-                                            Icon(
-                                              Icons.wb_sunny_rounded,
-                                              color: Colors.amber,
-                                              size: 20,
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text("27/33 \u00B0C",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16)),
-                                            SizedBox(
-                                              width: 10,
+                                            Row(
+                                              // ignore: prefer_const_literals_to_create_immutables
+                                              children: [
+                                                Container(
+                                                  height: 60,
+                                                  width: 60,
+                                                  //  color: Colors.red,
+                                                  child: Image.network(
+                                                    'http://openweathermap.org/img/wn/${snapshot.data!.weatherDesc.icon}@2x.png',
+                                                    height: 70,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                                // Icons(
+                                                //  Image.network('http://openweathermap.org/img/wn/10d@2x.png')
+                                                //   // color: Colors.white,
+                                                //  // size: 60,
+                                                // ),
+
+                                                Text(
+                                                    "${snapshot.data!.getmainWeather.temp.round()}\u00B0C",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 50)),
+                                              ],
                                             )
                                           ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                )
-                            ],
-                          );
-                        } else {
-                          return Container();
-                        }
-                      }),
-                )
-              ],
-            ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                      color: Colors.transparent,
+                                      // width: 80,
+                                      height: 100,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              snapshot.data!.weatherDesc
+                                                  .description,
+                                              style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 14)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                              "${snapshot.data!.getmainWeather.temp_max.round()}/${snapshot.data!.getmainWeather.temp_min.round()} \u00B0C",
+                                              style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 14)),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                              "Feels like ${snapshot.data!.getmainWeather.feels_like.round()}\u00B0C",
+                                              style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 14)),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ));
+                          } else {
+                            return Container();
+                          }
+                        }),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    SizedBox(
+                      width: double.maxFinite,
+                      height: 200,
+                      child: StreamBuilder(
+                          stream: weatherBlock?.stateMutipleStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return LoadingIndicator();
+                            }
+
+                            if (snapshot.hasData) {
+                              List<Weather> weatherList =
+                                  snapshot.data as List<Weather>;
+
+                              return ListView.builder(
+                                  // shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: weatherList.length,
+                                  itemBuilder: (context, position) {
+                                    return WheatherShowcase(
+                                        ciityIcon:
+                                            "http://openweathermap.org/img/wn/${weatherList[position].weatherDesc.icon}@2x.png",
+                                        ciityName: weatherList[position].name,
+                                        ciitywheater:
+                                            '${weatherList[position].getmainWeather.temp.round()}');
+                                  });
+                            } else {
+                              return Container(
+                                color: Colors.amber,
+                                child: Center(
+                                  child: LoadingIndicator(),
+                                ),
+                              );
+                            }
+                          }),
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.36,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: Colors.black.withOpacity(0.5)),
+                      child: StreamBuilder<List<WeatherFocast>>(
+                          stream: weatherBlock!.statetWeatherForecastStream,
+                          builder: (context, snapshot) {
+                            final dateFormated =
+                                DateFormat('EEE d,' 'hh:mm aaa');
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return LoadingIndicator();
+                            }
+                            if (snapshot.hasData) {
+                              return ListView.builder(
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, i) {
+                                    return Container(
+                                      color: Colors.transparent,
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.all(10),
+                                            color: Colors.transparent,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                    dateFormated.format(DateTime
+                                                        .fromMillisecondsSinceEpoch(
+                                                            snapshot.data![i]
+                                                                    .dt *
+                                                                1000)),
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16)),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Image.asset(
+                                                  "assets/images/icons8-humidity-64.png",
+                                                  height: 15,
+                                                ),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(
+                                                    "${snapshot.data![i].getmainWeather.humidity}%",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 14)),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.all(10),
+                                            color: Colors.transparent,
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Image.network(
+                                                  "http://openweathermap.org/img/wn/${snapshot.data![i].weatherDesc.icon}@2x.png",
+                                                  height: 20,
+                                                  width: 20,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text("27/33 \u00B0C",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16)),
+                                                SizedBox(
+                                                  width: 10,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            } else {
+                              return Container(
+                                color: Colors.amber,
+                                child: Center(
+                                  child: LoadingIndicator(),
+                                ),
+                              );
+                            }
+                          }),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
-    ));
+    );
   }
 
-  // void _update() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   cityList = prefs.getStringList('city');
-  //   if (cityList != null) {
-  //     print('city list' '${cityList!.length}');
-  //     for (int i = 0; i < cityList!.length; i++) {}
-  //   } else {}
-  // }
+  void _update() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    cityList = prefs.getStringList('city');
+    if (cityList != null) {
+      print('city list ${cityList!.length}');
+      // for (int i = 0; i < cityList!.length; i++) {}
+    } else {
+      print('city list is empty');
+    }
+  }
 
   Future<List<CityDataModel>> ReadJsonData() async {
     final jsondata =
@@ -476,6 +505,8 @@ class _HomeWeatherState extends State<HomeWeather> {
     return list.map((e) => CityDataModel.fromJson(e)).toList();
   }
 }
+
+class $ {}
 
 class CityDataModel {
   //data Type
@@ -492,52 +523,25 @@ class CityDataModel {
 }
 
 class LoadingIndicator extends StatelessWidget {
-  LoadingIndicator({this.text = ''});
-
-  final String text;
-
   @override
   Widget build(BuildContext context) {
-    var displayedText = text;
-
     return Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
         color: Colors.transparent,
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _getLoadingIndicator(),
-              _getHeading(context),
             ]));
   }
 
-  Padding _getLoadingIndicator() {
-    return Padding(
-        child: Container(
-            // color: Colors.amber,
-            child: Lottie.asset('assets/cities/61302-weather-icon.json'),
-            //
-            width: 100,
-            height: 100),
-        padding: EdgeInsets.only(bottom: 16));
-  }
-
-  Widget _getHeading(context) {
-    return Padding(
-        child: Text(
-          'Please wait …',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-          textAlign: TextAlign.center,
-        ),
-        padding: EdgeInsets.only(bottom: 4));
-  }
-
-  Text _getText(String displayedText) {
-    return Text(
-      displayedText,
-      style: TextStyle(color: Colors.white, fontSize: 14),
-      textAlign: TextAlign.center,
-    );
+  Container _getLoadingIndicator() {
+    return Container(
+        child: Lottie.asset('assets/cities/61302-weather-icon.json'),
+        //
+        width: 100,
+        height: 100);
   }
 }

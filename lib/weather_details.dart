@@ -5,13 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:weather_app/Bloc/weather_bloc.dart';
 import 'package:weather_app/Model/Get_Weather_Model.dart';
 import 'package:weather_app/Stored%20City/stored_file.dart';
+import 'package:weather_app/weather_home.dart';
 
 class WeatherDetails extends StatefulWidget {
   String ciityName;
 
   WeatherDetails({
     Key? key,
-    this.ciityName = "",
+    required this.ciityName,
   }) : super(key: key);
 
   @override
@@ -109,6 +110,9 @@ class _WeatherDetailsState extends State<WeatherDetails> {
                 StreamBuilder<Weather>(
                     stream: weatherBlock!.stateStream,
                     builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return LoadingIndicator();
+                      }
                       if (snapshot.hasData) {
                         final DateTime date =
                             DateTime.fromMillisecondsSinceEpoch(
@@ -118,11 +122,7 @@ class _WeatherDetailsState extends State<WeatherDetails> {
                             DateFormat('EEE d, MMM ' 'hh:mm aaa');
                         var outputDate = outputFormat.format(date);
                         // ignore: avoid_print
-                        print("new date firmatted $outputDate");
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return LoadingIndicator();
-                        }
+                        weatherBlock!.initGetForecasrCity(snapshot.data!.name);
 
                         return Container(
                             decoration: BoxDecoration(
@@ -236,92 +236,110 @@ class _WeatherDetailsState extends State<WeatherDetails> {
                               ],
                             ));
                       } else {
-                        return Container(
-                          color: Colors.amber,
-                        );
+                        return Container();
                       }
                     }),
                 SizedBox(
                   height: 30,
                 ),
                 Container(
-                  // ignore: unnecessary_new
-                  decoration: new BoxDecoration(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20.0),
                       color: Colors.black.withOpacity(0.5)),
-                  child: Column(
-                    children: [
-                      for (int i = 0; i < 6; i++)
-                        Container(
-                          color: Colors.transparent,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                color: Colors.transparent,
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("Tuesday",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16)),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Image.asset(
-                                      "assets/images/icons8-humidity-64.png",
-                                      height: 15,
-                                    ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text("80%",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14)),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                color: Colors.transparent,
-                                child: Row(
-                                  // ignore: prefer_const_literals_to_create_immutables
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Icon(
-                                      Icons.wb_sunny_rounded,
-                                      color: Colors.amber,
-                                      size: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("27/33 \u00B0C",
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16)),
-                                    SizedBox(
-                                      width: 10,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                    ],
-                  ),
+                  child: StreamBuilder<List<WeatherFocast>>(
+                      stream: weatherBlock!.statetWeatherForecastStream,
+                      builder: (context, snapshot) {
+                        final dateFormated = DateFormat('EEE d,' 'hh:mm aaa');
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return LoadingIndicator();
+                        }
+                        if (snapshot.hasData) {
+                          return ListView.builder(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, i) {
+                                return Container(
+                                  color: Colors.transparent,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                                dateFormated.format(DateTime
+                                                    .fromMillisecondsSinceEpoch(
+                                                        snapshot.data![i].dt *
+                                                            1000)),
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16)),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Image.asset(
+                                              "assets/images/icons8-humidity-64.png",
+                                              height: 15,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                                "${snapshot.data![i].getmainWeather.humidity}%",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14)),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Image.network(
+                                              "http://openweathermap.org/img/wn/${snapshot.data![i].weatherDesc.icon}@2x.png",
+                                              height: 20,
+                                              width: 20,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("27/33 \u00B0C",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16)),
+                                            SizedBox(
+                                              width: 10,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        } else {
+                          return Container(
+                            color: Colors.amber,
+                            child: Center(
+                              child: LoadingIndicator(),
+                            ),
+                          );
+                        }
+                      }),
                 )
               ],
             ),
@@ -360,55 +378,5 @@ class CityDataModel {
   //method that assign values to respective datatype vairables
   CityDataModel.fromJson(Map<String, dynamic> json) {
     city = json['city'];
-  }
-}
-
-class LoadingIndicator extends StatelessWidget {
-  LoadingIndicator({this.text = ''});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    var displayedText = text;
-
-    return Container(
-        padding: EdgeInsets.all(16),
-        color: Colors.black87,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _getLoadingIndicator(),
-              _getHeading(context),
-              _getText(displayedText)
-            ]));
-  }
-
-  Padding _getLoadingIndicator() {
-    return Padding(
-        child: Container(
-            child: CircularProgressIndicator(strokeWidth: 3),
-            width: 32,
-            height: 32),
-        padding: EdgeInsets.only(bottom: 16));
-  }
-
-  Widget _getHeading(context) {
-    return Padding(
-        child: Text(
-          'Please wait …',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-          textAlign: TextAlign.center,
-        ),
-        padding: EdgeInsets.only(bottom: 4));
-  }
-
-  Text _getText(String displayedText) {
-    return Text(
-      displayedText,
-      style: TextStyle(color: Colors.white, fontSize: 14),
-      textAlign: TextAlign.center,
-    );
   }
 }
