@@ -169,6 +169,16 @@ class _HomeWeatherState extends State<HomeWeather> {
                   child: Icon(
                     Icons.menu,
                   ),
+                  onTap: () async {
+                    print('open new page');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CityList(
+                                refresh: refresh,
+                              )),
+                    );
+                  },
                 ),
                 actions: [
                   Padding(
@@ -184,30 +194,6 @@ class _HomeWeatherState extends State<HomeWeather> {
                           size: 26.0,
                         ),
                       )),
-                  Padding(
-                    padding: EdgeInsets.only(right: 20.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        print('open new page');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CityList(
-                                    refresh: refresh,
-                                  )),
-                        );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const CityList()),
-                        // );
-                      },
-                      child: Icon(
-                        Icons.add,
-                        size: 26.0,
-                      ),
-                    ),
-                  )
                 ],
               ),
               Padding(
