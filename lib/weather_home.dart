@@ -168,6 +168,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                 leading: GestureDetector(
                   child: Icon(
                     Icons.menu,
+                    size: 30.0,
                   ),
                   onTap: () async {
                     print('open new page');
@@ -191,7 +192,7 @@ class _HomeWeatherState extends State<HomeWeather> {
                         },
                         child: Icon(
                           Icons.refresh,
-                          size: 26.0,
+                          size: 30.0,
                         ),
                       )),
                 ],
