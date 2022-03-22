@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/weather_home.dart';
+import 'package:weather_app/User%20Interface/splash_screen.dart';
+import 'package:weather_app/User%20Interface/weather_home.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  static final title = '';
 
-  // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather Focast',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomeWeather(),
+      home: SplashScreen(),
     );
   }
 }
